@@ -1,6 +1,6 @@
 import sys
 
-P = r"C:\Users\LilYas777\Downloads\World_of_Tanks_0.08.02.00.00_RU_0349_SD\res\scripts\common\arenatype.pyc"
+P = r"C:\Users\User\Downloads\World_of_Tanks"
 b = open(P, "rb").read()
 
 subs = [
