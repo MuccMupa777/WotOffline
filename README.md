@@ -1,6 +1,6 @@
 # 🛠️ WotOffline — Offline Runtime for World of Tanks 0.8.2
 
-WorOffline is an experimental offline runtime for World of Tanks 0.8.2.
+WotOffline is an experimental offline runtime for World of Tanks 0.8.2.
 
 The project replaces client-server interaction with a fully local emulation layer, enabling:
 - offline hangar functionality
