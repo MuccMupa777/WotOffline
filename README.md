@@ -103,7 +103,7 @@ See the `LICENSE` file for full details.
 
 This project is based on prior work:
 
-- **SigmaTel71**  
+- **SigmaTel71 / DrWeb7_1**  
   https://github.com/SigmaTel71/mod_offhangar_legacy
 
 - **IzeBerg**  
