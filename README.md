@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/26298703/README.md)
 # 🛠️ WorOffline — Offline Runtime for World of Tanks 0.8.2
 
 WorOffline is an experimental offline runtime for World of Tanks 0.8.2.
