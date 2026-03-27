@@ -1,163 +1,168 @@
-# 🚀 Major Refactor: Offline Architecture Overhaul
+[README.md](https://github.com/user-attachments/files/26298703/README.md)
+# 🛠️ WorOffline — Offline Runtime for World of Tanks 0.8.2
 
-## 🔧 Core Architecture
-- Replaced monolithic request handling (`requests.pyc`)
-- Introduced modular pipeline:
-  - `CommandRouter` — centralized dispatch
-  - `command_handlers` — separated logic
-  - `FakeServer` — transport only
-- Unified request lifecycle (`RequestResult`)
-- Normalized responses (`onCmdResponse / onCmdResponseExt`)
+WorOffline is an experimental offline runtime for World of Tanks 0.8.2.
 
----
-
-## ⚔️ Offline Battle System (New)
-- Added `offline_battle.py`
-  - Handles: enqueue → arena → avatar
-- Added `offline_battle_stack.py`
-  - Builds battle context:
-    - teams
-    - vehicles
-    - arena metadata
-- Implemented:
-  - `onEnqueued`
-  - `onArenaCreated`
+The project replaces client-server interaction with a fully local emulation layer, enabling:
+- offline hangar functionality
+- fake account environment
+- partial battle simulation infrastructure
 
 ---
 
-## 🧠 Battle Context & Arena Simulation
-- Added `_resolve_real_arena_type()`
-- Implemented `_OfflineArenaStub`
-  - prevents crashes
-  - provides safe defaults
-- Added `_OfflineVehicleStub`
+## 🚀 Features
+
+### 🏠 Offline Hangar
+- Full account emulation (credits, gold, XP)
+- Offline shop and inventory generation
+- All vehicles available
+- No server dependency
+
+### ⚙️ Server Emulation
+- FakeServer replacing Wargaming backend
+- Command routing via `CommandRouter`
+- Full support for `AccountCommands`
+
+### ⚔️ Battle Infrastructure (Work in Progress)
+- Enqueue interception
+- Offline battle bootstrap
+- Arena context generation
+- Avatar and entity stabilization
+
+> ⚠️ Full battle gameplay is NOT implemented yet.  
+> The current goal is infrastructure and runtime simulation.
 
 ---
 
-## 🔌 Transport & Protocol
-- Reworked `FakeServer`
-- Integrated with `CommandRouter`
-- Added support for:
-  - `doCmdInt*`
-  - array-based commands
-- Added collision-safe command handling
+## 🧠 Architecture Overview
+
+The project is structured as a layered offline runtime:
+
+```
+Client (WoT)
+   ↓
+FakeServer (transport layer)
+   ↓
+CommandRouter (protocol layer)
+   ↓
+Command Handlers (logic layer)
+   ↓
+Offline Battle System (runtime layer)
+```
+
+### Key Modules
+
+- `server.py` — transport layer (FakeServer)
+- `command_router.py` — command dispatch
+- `command_handlers.py` — command logic
+- `offline_battle.py` — battle orchestration
+- `offline_battle_stack.py` — battle context builder
+- `mod_offhangar.py` — hooks and integration layer
 
 ---
 
-## 🧩 Command Handling
-- Replaced `BASE_REQUESTS` with explicit handlers
-- Added:
-  - `handle_enqueue_random`
-  - `handle_prebattle`
-  - `handle_sync*`
-- Added collision handler:
-  - `handle_stats_or_enqueue_collision`
-- Added fallback:
-  - `handle_unknown`
+## 📦 Installation
+
+1. Copy compiled scripts into:
+```
+res_mods/0.8.2/scripts/client/gui/mods/
+```
+
+2. Launch the game.
+
+3. The client will automatically connect to the offline server.
 
 ---
 
-## 🛡️ Session & Restrictions Bypass
-- Disabled:
-  - captcha
-  - parental control
-  - session limits
-- Forced:
-  - `isAccountAllowedToBattle = True`
-  - `canJoinBattle = True`
+## ⚠️ Important Notes
+
+- This project modifies core client behavior.
+- It relies on reverse engineering of the BigWorld engine.
+- Stability may vary depending on client build.
 
 ---
 
-## 🧠 PlayerAccount Hooking
-- Overrode:
-  - `__init__`
-  - `__getattribute__`
-- Injected:
-  - fake server
-  - offline identity
-  - dynamic vehicle & arena handling
+## 📄 License
+
+This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+
+You are free to:
+- Use the software
+- Modify the source code
+- Distribute copies
+
+Under the following conditions:
+- You must disclose source code
+- You must keep the same license (GPLv3)
+- You must include copyright notices
+
+See the `LICENSE` file for full details.
 
 ---
 
-## 🔁 Matchmaking Interception
-- Hooked:
-  - `__doCmd`
-  - `enqueueRandom`
-  - alternative enqueue methods
-- Ensures compatibility across client builds
+## 📚 Credits
+
+This project is based on prior work:
+
+- **SigmaTel71**  
+  https://github.com/SigmaTel71/mod_offhangar_legacy
+
+- **IzeBerg**  
+  Original implementation of the offhangar concept (ported from newer WoT versions)
+
+This repository extends and refactors their work into a modular offline runtime system.
 
 ---
 
-## 🎮 Avatar & World Stability
-- Added avatar guards:
-  - `onEnterWorld`
-  - `onLeaveWorld`
-- Safe vehicle fallback
-- Crash protection for missing data
+## ⚠️ Disclaimer
+
+This project is **not affiliated with Wargaming.net**.
+
+All trademarks and game assets belong to their respective owners.
+
+This software is provided **"as is"**, without warranty of any kind.
+
+Use at your own risk.
 
 ---
 
-## 🎮 Input System Stabilization
-- Patched:
-  - `AccountInputHandler`
-  - `AvatarInputHandler`
-- Fixed missing:
-  - `typeDescriptor`
-  - reload markers
+## 🎯 Project Status
+
+🟡 Active development
+
+Current focus:
+- battle runtime infrastructure
+- stable arena initialization
+- avatar lifecycle handling
+
+Future goals:
+- full offline battle simulation
+- entity update loop
+- AI or scripted battle behavior
 
 ---
 
-## 🌍 World Control
-- Overrode:
-  - `BigWorld.clearEntitiesAndSpaces`
-- Prevents unwanted world reset
+## 🧪 Purpose
+
+This project is intended for:
+- research
+- reverse engineering
+- educational purposes
 
 ---
 
-## 🏪 Hangar & Economy
-- Implemented offline shop
-- Overrode `Shop.__onSyncComplete`
-- Added:
-  - inventory generation
-  - full unlock support
+## 💬 Contributing
 
----
-
-## ⏱️ Time & Session Emulation
-- Overrode:
-  - server time
-  - session logic
-- Fixed UI consistency
-
----
-
-## 🔌 Connection Layer
-- Overrode `BigWorld.connect`
-- Auto-login to offline server
-- Local Account entity creation
-
----
-
-## 🧰 Dev Tools
-- Added:
-  - `build_mod.py`
-  - `inspect_arenatype.py`
-  - `scan_pyc_strings.py`
-- Added `CameraNode` loader polyfill
-
----
-
-## ⚠️ Breaking Changes
-- Removed `requests.pyc`
-- Replaced request handling system
-- Introduced full hook-based architecture
-- Battle flow now actively simulated
+Contributions, experiments and ideas are welcome.
 
 ---
 
 ## 🧠 Summary
-This update transforms the project from:
 
-❌ Simple offline hangar mod  
-➡️  
-✅ Modular offline runtime with battle simulation
+WorOffline transforms World of Tanks from:
+
+❌ Online-only client  
+
+into  
+
+✅ Modular offline runtime with server emulation and battle simulation foundations
