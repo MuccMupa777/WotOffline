@@ -1,150 +1,163 @@
-🚀 Major Refactor: Offline Architecture Overhaul
-  🔧 Core Architecture
-  Replaced monolithic request handling (requests.pyc) with a modular command processing pipeline:
-  Introduced CommandRouter for centralized command dispatch
-  Added command_handlers for explicit command logic separation
-  Decoupled transport layer (FakeServer) from business logic
-  Implemented structured request lifecycle:
-  Unified RequestResult handling
-  Normalized response flow via onCmdResponse / onCmdResponseExt
-⚔️ Offline Battle System (New)
-  🆕 Added full offline battle bootstrap system
-  Introduced offline_battle.py:
-  Handles enqueue → arena → avatar transition
-  Simulates server-side matchmaking flow
-  Added offline_battle_stack.py:
-  Builds battle context:
-  teams
-  vehicles
-  arena metadata
-  Supports real VehicleTypeDescriptor fallback
-  Implemented:
-  onEnqueued
-  onArenaCreated
-  battle entry orchestration
-🧠 Battle Context & Arena Simulation
-Added dynamic arena type resolution:
-_resolve_real_arena_type()
-fallback to safe stub if unavailable
-Implemented _OfflineArenaStub:
-Prevents crashes on missing arena data
-Provides safe defaults for:
-minimap
-events
-vehicle access
-Introduced _OfflineVehicleStub for safe avatar fallback
-🔌 Transport & Protocol Layer
-Reworked FakeServer:
-Integrated with CommandRouter
-Added full support for:
-doCmdInt*
-doCmdIntArr
-doCmdIntArrStrArr
-Added routing abstraction:
-Command resolution via numeric ID + name
-Collision-safe handling of legacy AccountCommands
-🧩 Command Handling Improvements
-Replaced implicit request map (BASE_REQUESTS) with explicit handlers:
-handle_enqueue_random
-handle_prebattle
-handle_sync*
-Added collision-safe handler:
-handle_stats_or_enqueue_collision
-Resolves overlapping command IDs in legacy builds
-Introduced fallback handler (handle_unknown)
-Prevents client crashes on unimplemented commands
-🛡️ Session & Restrictions Bypass
-Added session_guards.py:
-Disabled:
-captcha
-parental control
-session limits
-Forced battle access:
-isAccountAllowedToBattle → True
-canJoinBattle → True
-🧠 PlayerAccount Hooking (Major)
-Overrode core PlayerAccount behavior:
-__init__ → inject offline state
-__getattribute__ → dynamic overrides:
-vehicleTypeDescriptor
-playerVehicleID
-arena
-server/cell/base
-Implemented fake server binding:
-baseSelf.fakeServer = FakeServer()
-Added offline identity:
-nickname
-server settings
-offline flags
-🔁 Matchmaking Interception
-🆕 Multi-layer enqueue interception
-Hooked:
-PlayerAccount.__doCmd
-enqueueRandom
-alternative enqueue methods (auto-detected)
-Ensures:
-battle trigger works across different client builds
-🎮 Avatar & World Stability Layer
-Added _install_offline_avatar_guards():
-stabilizes onEnterWorld
-protects against missing vehicle/entity state
-Implemented:
-safe vehicle attachment
-fallback for missing model errors
-Patched:
-onLeaveWorld
-getVehicleAttached
-🎮 Input System Stabilization
-Patched:
-AccountInputHandler
-AvatarInputHandler
-Added safeguards against:
-missing typeDescriptor
-missing reload markers
-🌍 World & Entity Control
-Overrode BigWorld.clearEntitiesAndSpaces:
-prevents world reset in offline mode
-Controlled teardown behavior:
-prevents unintended session destruction
-🏪 Hangar & Economy
-Implemented full offline shop:
-custom pricing
-unlimited resources
-free XP conversion
-Overrode:
-Shop.__onSyncComplete
-Added:
-offline inventory generation
-full tech tree unlock support
-⏱️ Time & Session Emulation
-Overrode:
-server time
-session tracking
-weekly playtime
-Ensures:
-UI consistency
-no session lockouts
-🔌 Connection Layer
-Overrode BigWorld.connect:
-bypass real server
-spawn local Account entity
-Modified login flow:
-auto-connect to offline server
-🧰 Dev & Tooling
-Added:
-build_mod.py (auto compile & deploy)
-inspect_arenatype.py (reverse tools)
-scan_pyc_strings.py (binary inspection)
-Added CameraNode polyfill:
-ensures mod loader compatibility
-⚠️ Breaking Changes
-Removed legacy requests.pyc architecture
-Replaced implicit command handling with explicit routing
-Introduced multiple hook layers (Account, Avatar, BigWorld)
-Battle flow is no longer passive — now actively simulated
-🧠 Summary
+# 🚀 Major Refactor: Offline Architecture Overhaul
+
+## 🔧 Core Architecture
+- Replaced monolithic request handling (`requests.pyc`)
+- Introduced modular pipeline:
+  - `CommandRouter` — centralized dispatch
+  - `command_handlers` — separated logic
+  - `FakeServer` — transport only
+- Unified request lifecycle (`RequestResult`)
+- Normalized responses (`onCmdResponse / onCmdResponseExt`)
+
+---
+
+## ⚔️ Offline Battle System (New)
+- Added `offline_battle.py`
+  - Handles: enqueue → arena → avatar
+- Added `offline_battle_stack.py`
+  - Builds battle context:
+    - teams
+    - vehicles
+    - arena metadata
+- Implemented:
+  - `onEnqueued`
+  - `onArenaCreated`
+
+---
+
+## 🧠 Battle Context & Arena Simulation
+- Added `_resolve_real_arena_type()`
+- Implemented `_OfflineArenaStub`
+  - prevents crashes
+  - provides safe defaults
+- Added `_OfflineVehicleStub`
+
+---
+
+## 🔌 Transport & Protocol
+- Reworked `FakeServer`
+- Integrated with `CommandRouter`
+- Added support for:
+  - `doCmdInt*`
+  - array-based commands
+- Added collision-safe command handling
+
+---
+
+## 🧩 Command Handling
+- Replaced `BASE_REQUESTS` with explicit handlers
+- Added:
+  - `handle_enqueue_random`
+  - `handle_prebattle`
+  - `handle_sync*`
+- Added collision handler:
+  - `handle_stats_or_enqueue_collision`
+- Added fallback:
+  - `handle_unknown`
+
+---
+
+## 🛡️ Session & Restrictions Bypass
+- Disabled:
+  - captcha
+  - parental control
+  - session limits
+- Forced:
+  - `isAccountAllowedToBattle = True`
+  - `canJoinBattle = True`
+
+---
+
+## 🧠 PlayerAccount Hooking
+- Overrode:
+  - `__init__`
+  - `__getattribute__`
+- Injected:
+  - fake server
+  - offline identity
+  - dynamic vehicle & arena handling
+
+---
+
+## 🔁 Matchmaking Interception
+- Hooked:
+  - `__doCmd`
+  - `enqueueRandom`
+  - alternative enqueue methods
+- Ensures compatibility across client builds
+
+---
+
+## 🎮 Avatar & World Stability
+- Added avatar guards:
+  - `onEnterWorld`
+  - `onLeaveWorld`
+- Safe vehicle fallback
+- Crash protection for missing data
+
+---
+
+## 🎮 Input System Stabilization
+- Patched:
+  - `AccountInputHandler`
+  - `AvatarInputHandler`
+- Fixed missing:
+  - `typeDescriptor`
+  - reload markers
+
+---
+
+## 🌍 World Control
+- Overrode:
+  - `BigWorld.clearEntitiesAndSpaces`
+- Prevents unwanted world reset
+
+---
+
+## 🏪 Hangar & Economy
+- Implemented offline shop
+- Overrode `Shop.__onSyncComplete`
+- Added:
+  - inventory generation
+  - full unlock support
+
+---
+
+## ⏱️ Time & Session Emulation
+- Overrode:
+  - server time
+  - session logic
+- Fixed UI consistency
+
+---
+
+## 🔌 Connection Layer
+- Overrode `BigWorld.connect`
+- Auto-login to offline server
+- Local Account entity creation
+
+---
+
+## 🧰 Dev Tools
+- Added:
+  - `build_mod.py`
+  - `inspect_arenatype.py`
+  - `scan_pyc_strings.py`
+- Added `CameraNode` loader polyfill
+
+---
+
+## ⚠️ Breaking Changes
+- Removed `requests.pyc`
+- Replaced request handling system
+- Introduced full hook-based architecture
+- Battle flow now actively simulated
+
+---
+
+## 🧠 Summary
 This update transforms the project from:
-❌ Simple offline hangar mod
-into:
-✅ Fully modular offline runtime with battle simulation capabilities
-Credits: https://github.com/SigmaTel71/mod_offhangar_legacy by SigmaTel71 and https://github.com/IzeBerg
+
+❌ Simple offline hangar mod  
+➡️  
+✅ Modular offline runtime with battle simulation
