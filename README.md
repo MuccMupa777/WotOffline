@@ -1,27 +1,27 @@
 🚀 Major Refactor: Offline Architecture Overhaul
-🔧 Core Architecture
-Replaced monolithic request handling (requests.pyc) with a modular command processing pipeline:
-Introduced CommandRouter for centralized command dispatch
-Added command_handlers for explicit command logic separation
-Decoupled transport layer (FakeServer) from business logic
-Implemented structured request lifecycle:
-Unified RequestResult handling
-Normalized response flow via onCmdResponse / onCmdResponseExt
+  🔧 Core Architecture
+  Replaced monolithic request handling (requests.pyc) with a modular command processing pipeline:
+  Introduced CommandRouter for centralized command dispatch
+  Added command_handlers for explicit command logic separation
+  Decoupled transport layer (FakeServer) from business logic
+  Implemented structured request lifecycle:
+  Unified RequestResult handling
+  Normalized response flow via onCmdResponse / onCmdResponseExt
 ⚔️ Offline Battle System (New)
-🆕 Added full offline battle bootstrap system
-Introduced offline_battle.py:
-Handles enqueue → arena → avatar transition
-Simulates server-side matchmaking flow
-Added offline_battle_stack.py:
-Builds battle context:
-teams
-vehicles
-arena metadata
-Supports real VehicleTypeDescriptor fallback
-Implemented:
-onEnqueued
-onArenaCreated
-battle entry orchestration
+  🆕 Added full offline battle bootstrap system
+  Introduced offline_battle.py:
+  Handles enqueue → arena → avatar transition
+  Simulates server-side matchmaking flow
+  Added offline_battle_stack.py:
+  Builds battle context:
+  teams
+  vehicles
+  arena metadata
+  Supports real VehicleTypeDescriptor fallback
+  Implemented:
+  onEnqueued
+  onArenaCreated
+  battle entry orchestration
 🧠 Battle Context & Arena Simulation
 Added dynamic arena type resolution:
 _resolve_real_arena_type()
